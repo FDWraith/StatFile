@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <time.h>
 
 int main(){
   struct stat buffer;
@@ -14,7 +15,7 @@ int main(){
     printf("Error message:[%s]\n", strerror(errno));
   }
   printf("File Size: [%d]\n", buffer.st_size);
-  printf("Mode: [%d]\n", buffer.st_mode);
-  printf("Time of Last Access: [%s]\n", buffer.st_atim);
+  printf("Mode: [%o]\n", buffer.st_mode);
+  printf("Time of Last Access: [%s]\n", ctime(&buffer.st_atim));
   return 0;
 }

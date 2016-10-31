@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <time.h>
+#include <pwd.h>
 
 int main(){
   struct stat buffer;
@@ -47,31 +48,47 @@ int main(){
     break;
   }
   
-  printf("File Size: [%d%s]\n", s, end );
-  printf("Mode: [%o]\n", buffer.st_mode);
-  printf("Time of Last Access: [%s]\n", ctime(&buffer.st_atim));
+  printf("File Size: %d%s\n", s, end );
+  printf("Mode: %o\n", buffer.st_mode);
+  printf("Time of Last Access: %s", ctime(&buffer.st_atim));
 
-  char dirPerms[10];
-  dirPerms[0] = S_ISDIR( buffer.st_mode) ? "d" : "-";
-  dirPerms[1] = ( buffer.st_mode & S_IRUSR ) ? "r" : "-";
-  dirPerms[2] = ( buffer.st_mode & S_IWUSR ) ? "w" : "-";
-  dirPerms[3] = ( buffer.st_mode & S_IXUSR ) ? "x" : "-";
-  dirPerms[4] = ( buffer.st_mode & S_IRGRP ) ? "r" : "-";
-  dirPerms[5] = ( buffer.st_mode & S_IWGRP ) ? "w" : "-";
-  dirPerms[6] = ( buffer.st_mode & S_IXGRP ) ? "x" : "-";
-  dirPerms[7] = ( buffer.st_mode & S_IROTH ) ? "r" : "-";
-  dirPerms[8] = ( buffer.st_mode & S_IWOTH ) ? "w" : "-";
-  dirPerms[9] = ( buffer.st_mode & S_IXOTH ) ? "x" : "-";
-
+  char dirPerms[11];
+  dirPerms[0] = S_ISDIR(buffer.st_mode) ? 'd' : '-';
+  dirPerms[1] = ( buffer.st_mode & S_IRUSR ) ? 'r' : '-';
+  dirPerms[2] = ( buffer.st_mode & S_IWUSR ) ? 'w' : '-';
+  dirPerms[3] = ( buffer.st_mode & S_IXUSR ) ? 'x' : '-';
+  dirPerms[4] = ( buffer.st_mode & S_IRGRP ) ? 'r' : '-';
+  dirPerms[5] = ( buffer.st_mode & S_IWGRP ) ? 'w' : '-';
+  dirPerms[6] = ( buffer.st_mode & S_IXGRP ) ? 'x' : '-';
+  dirPerms[7] = ( buffer.st_mode & S_IROTH ) ? 'r' : '-';
+  dirPerms[8] = ( buffer.st_mode & S_IWOTH ) ? 'w' : '-';
+  dirPerms[9] = ( buffer.st_mode & S_IXOTH ) ? 'x' : '-';
+  dirPerms[10] = 0;
+  
+  //printf("DirPerms:%s\n", dirPerms);
+  //printf("User:%d\n", buffer.st_uid);
+  //printf("Group:%d\n", buffer.st_gid);
+  //printf("Size:%d\n", buffer.st_size);
+  
   char str[100];
   strcpy(str, ctime(&buffer.st_atim) );
-  strncpy( str, str, strlen(str) - 9);
+  //strncpy( str, str, strlen(str) - 9);
   char newStr[100];
   int i =4;
-  for(;i<strlen(str);i++){
+  for(;i<strlen(str) - 9;i++){
     newStr[i-4] = str[i];
   }
-  printf("%s %s %s %d %s\n", dirPerms, buffer.st_uid, buffer.st_gid, buffer.st_size, newStr );
+  struct passwd *pwdUser = getpwuid(buffer.st_uid);
+  struct passwd *pwdGroup = getpwuid(buffer.st_gid);
+  char * userName;
+  char * groupName;
+  if( pwdUser != NULL ){
+    userName = (*pwdUser).pw_name;
+  }
+  if( pwdUser != NULL ){
+    groupName = (*pwdGroup).pw_name;
+  }
+  printf("%s %s %s %d %s %s\n", dirPerms, userName, groupName, buffer.st_size, newStr, "file.txt" );
   
   return 0;
 }

@@ -50,5 +50,28 @@ int main(){
   printf("File Size: [%d%s]\n", s, end );
   printf("Mode: [%o]\n", buffer.st_mode);
   printf("Time of Last Access: [%s]\n", ctime(&buffer.st_atim));
+
+  char dirPerms[10];
+  dirPerms[0] = S_ISDIR( buffer.st_mode) ? "d" : "-";
+  dirPerms[1] = ( buffer.st_mode & S_IRUSR ) ? "r" : "-";
+  dirPerms[2] = ( buffer.st_mode & S_IWUSR ) ? "w" : "-";
+  dirPerms[3] = ( buffer.st_mode & S_IXUSR ) ? "x" : "-";
+  dirPerms[4] = ( buffer.st_mode & S_IRGRP ) ? "r" : "-";
+  dirPerms[5] = ( buffer.st_mode & S_IWGRP ) ? "w" : "-";
+  dirPerms[6] = ( buffer.st_mode & S_IXGRP ) ? "x" : "-";
+  dirPerms[7] = ( buffer.st_mode & S_IROTH ) ? "r" : "-";
+  dirPerms[8] = ( buffer.st_mode & S_IWOTH ) ? "w" : "-";
+  dirPerms[9] = ( buffer.st_mode & S_IXOTH ) ? "x" : "-";
+
+  char str[100];
+  strcpy(str, ctime(&buffer.st_atim) );
+  strncpy( str, str, strlen(str) - 9);
+  char newStr[100];
+  int i =4;
+  for(;i<strlen(str);i++){
+    newStr[i-4] = str[i];
+  }
+  printf("%s %s %s %d %s\n", dirPerms, buffer.st_uid, buffer.st_gid, buffer.st_size, newStr );
+  
   return 0;
 }
